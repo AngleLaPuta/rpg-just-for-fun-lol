@@ -1,4 +1,5 @@
 from time import sleep
+import textwrap
 from pytmx import load_pygame
 from pathlib import Path
 from urllib.parse import urlparse
@@ -380,8 +381,10 @@ class button:
 def text(text, x, y, size=20):
     global screen
     font = pygame.font.SysFont('Comic Sans MS', size)
-    text = font.render(text, True, (0, 0, 0))
-    screen.blit(text, (x - text.get_width() // 2, y - text.get_height() // 2))
+    wrapped_text = textwrap.wrap(text, width=width)
+    for i, line in enumerate(wrapped_text):
+        text = font.render(line, True, (0, 0, 0))
+        screen.blit(text, (x - text.get_width() // 2, y - text.get_height() * len(wrapped_text) // 2 + i * size))
 
 
 def load(file):
