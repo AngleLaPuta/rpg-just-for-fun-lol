@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="39" height="28" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="17">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="39" height="28" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="18">
  <tileset firstgid="1" name="RPG Nature Tileset" tilewidth="32" tileheight="32" tilecount="180" columns="20">
   <image source="textures/RPG Nature Tileset.png" width="641" height="288"/>
  </tileset>
@@ -167,9 +167,9 @@
    </properties>
   </object>
   <object id="6" gid="25" x="518.018" y="-109.289" width="32" height="32"/>
-  <object id="11" gid="3" x="672.5" y="352" width="32" height="32">
+  <object id="11" gid="3" x="598.214" y="350.045" width="32" height="32">
    <properties>
-    <property name="Message" type="file" value=""/>
+    <property name="Message" value="hit z or x to get into the house"/>
    </properties>
   </object>
  </objectgroup>
@@ -291,6 +291,7 @@
  <objectgroup id="11" name="Start">
   <object id="13" gid="570" x="546" y="482" width="32" height="32"/>
  </objectgroup>
+ <objectgroup id="14" name="House"/>
  <objectgroup id="12" name="Enemy">
   <object id="14" name="Bobert" gid="510" x="858" y="506" width="32" height="32">
    <properties>
