@@ -426,7 +426,6 @@ def load(file):
     player.x = save.getint('PLAYER', 'xpos')
     player.y = save.getint('PLAYER', 'ypos')
     lebel = save.getint('PLAYER', 'level')
-    print(lebel)
     player.coins = save.getint('PLAYER', 'coins')
 
 

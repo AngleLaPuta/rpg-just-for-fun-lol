@@ -5,8 +5,8 @@ fullscreen = false
 [PLAYER]
 name = Kit
 pronouns = [kit,kit,kits,kits,kitself]
-xpos = 821
-ypos = 694
+xpos = 536
+ypos = 437
 level = 2
 coins = 727
 
