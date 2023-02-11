@@ -13,8 +13,10 @@ import pygame
 import os
 import tkinter
 import configparser
+from translate import Translator
 
 debug = True
+gfont = 'Comic Sans MS'
 
 fullscreen = False
 BLACK = (0, 0, 0)
@@ -33,6 +35,20 @@ name = ""
 dir_list = os.listdir()
 xoffset = 0
 yoffset = 0
+lang = 'es'
+
+##TRANSLATIONS AND STUFF
+try:
+    tr = Translator(to_lang=lang)
+    title = tr.translate('INSERT TITLE HERE')
+except:
+    class trans:
+        def translate(self, word):
+            return word
+
+
+    tr = trans()
+    title = tr.translate('INSERT TITLE HERE')
 
 sprite = pygame.image.load('sprite.png')
 
@@ -70,7 +86,7 @@ class Player:
         self.x = 500
         self.y = 500
         self.color = (0, 250, 23)
-        self.inv=['ball','banana']
+        self.inv = ['ball', 'banana']
         self.coins = 0
         self.att = []
 
@@ -83,15 +99,13 @@ class Player:
 
     def invDraw(self):
         global screen
-        x = (size[0]-50*len(self.inv))//2
-        y = size[1]-100
-        for i in range(0,len(self.inv)):
-            tile = pygame.Rect(x,y, 50, 50)
-            pygame.draw.rect(screen, (100,100,100), tile)
-            pygame.draw.rect(screen, BLACK, tile,2)
-            x+=50
-
-
+        x = (size[0] - 50 * len(self.inv)) // 2
+        y = size[1] - 100
+        for i in range(0, len(self.inv)):
+            tile = pygame.Rect(x, y, 50, 50)
+            pygame.draw.rect(screen, (100, 100, 100), tile)
+            pygame.draw.rect(screen, BLACK, tile, 2)
+            x += 50
 
     @staticmethod
     def grounded(x, y):
@@ -113,43 +127,45 @@ class Player:
         for i in range(0, len(tiles)):
             try:
                 tiles[i].colissions(player.x, player.y)
-                if 0<tiles[i].x < size[0] and 0< tiles[i].y<size[1]:
+                if 0 < tiles[i].x < size[0] and 0 < tiles[i].y < size[1]:
                     if tiles[i].y == ltile.y and tiles[i].x == ptile.x - tilesize:
                         if tiles[i].walkable:
                             ltile = tiles[i]
-                            #tiles[i].color = RED
+                            # tiles[i].color = RED
                         else:
                             ltile = ptile
                     if tiles[i].y == rtile.y and tiles[i].x == ptile.x + tilesize:
                         if tiles[i].walkable:
                             rtile = tiles[i]
-                            #tiles[i].color = GREEN
+                            # tiles[i].color = GREEN
                         else:
                             rtile = ptile
 
                     if tiles[i].x == utile.x and tiles[i].y == ptile.y - tilesize:
                         if tiles[i].walkable:
                             utile = tiles[i]
-                            #tiles[i].color = YELLOW
+                            # tiles[i].color = YELLOW
                         else:
                             utile = ptile
                     if tiles[i].x == dtile.x and tiles[i].y == ptile.y + tilesize:
                         if tiles[i].walkable:
                             dtile = tiles[i]
-                            #tiles[i].color = BLUE
+                            # tiles[i].color = BLUE
                         else:
                             dtile = ptile
             except:
-                print(f'tile {i} isnt fuckin working')
+                print(f'tile {i} isnt working')
 
-            #if not (tiles[i] == utile or tiles[i] == dtile or tiles[i] == ltile or tiles[i] == rtile):
-                #tiles[i].color = None
+            # if not (tiles[i] == utile or tiles[i] == dtile or tiles[i] == ltile or tiles[i] == rtile):
+            # tiles[i].color = None
 
         for tile in behind:
-            if tile.colissions(self.x + self.width / 2, self.y + self.height / 2) and not keys[pygame.K_DOWN] and self.y + self.height > tile.y + tilesize:
+            if tile.colissions(self.x + self.width / 2, self.y + self.height / 2) and not keys[
+                pygame.K_DOWN] and self.y + self.height > tile.y + tilesize:
                 player.y = tile.y
 
-        if 0.2 * size[0] <= self.x + self.width / 2 <= 0.8 * size[0] and 0.2 * size[1] <= self.y + self.height / 2 <= 0.8 * size[1]:
+        if 0.2 * size[0] <= self.x + self.width / 2 <= 0.8 * size[0] and 0.2 * size[
+            1] <= self.y + self.height / 2 <= 0.8 * size[1]:
             if keys[pygame.K_LEFT] and (self.x - speed > ltile.x) and self.grounded(self.x - speed, self.y):
                 self.x -= speed
             if keys[pygame.K_RIGHT] and (
@@ -251,15 +267,17 @@ class Transport(Tile):
             else:
                 lebel += 1
                 loadLevel(lebel)
+                findinfo()
                 return
         return False
 
+
 class House(Transport):
-    def __init__(self, x, y, img,goto):
+    def __init__(self, x, y, img, goto):
         Transport.__init__(self, x, y, img)
         self.size = self.height = tilesize
         self.img = pygame.transform.scale(img, (tilesize, tilesize))
-        self.goto =goto
+        self.goto = goto
 
     def colissions(self, x, y):
         global lebel, tiled_map
@@ -273,10 +291,24 @@ class House(Transport):
                 # text('Press z or x to continue', size[0] / 2, size[1] - 100, 30)
                 pygame.display.flip()
             else:
+                findinfo()
                 loadLevel(self.goto)
                 return
         return False
 
+
+class Door(House):
+    def __init__(self, x, y, img, goto):
+        House.__init__(self, x, y, img, goto)
+
+    def colissions(self, x, y):
+        global lebel, tiled_map
+        width = player.width
+        height = player.height
+        rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        if x + width >= self.x and y + height >= self.y and x <= self.x + self.width and y <= self.y + self.height:
+            loadLevel(self.goto)
+        return False
 
 
 class Sign(Tile):
@@ -285,7 +317,10 @@ class Sign(Tile):
         self.x = x
         self.y = y
         self.touched = False
-        self.message = mess
+        try:
+            self.message = tr.translate(mess)
+        except:
+            self.message = mess
         self.name = name
 
     def colissions(self, x, y):
@@ -301,9 +336,9 @@ class Sign(Tile):
         return False
 
     def textbox(self, message, width):
-        global done
+        global done, gfont
         color = PURPLE
-        width = max(int(pygame.font.SysFont('Comic Sans MS', 20).render(message, True, (
+        width = max(int(pygame.font.SysFont(gfont, 20).render(message, True, (
             255 - color[0], 255 - color[1], 255 - color[2])).get_width() * 1.1), 400)
         for i in range(0, width):
             rect = pygame.Rect(size[0] / 2 - i / 2, size[1] - 200, i, 100)
@@ -313,10 +348,10 @@ class Sign(Tile):
             rect = pygame.Rect(size[0] / 2 - width / 2, size[1] - 200, width, 100)
             pygame.draw.rect(screen, color, rect, 0)
             if self.name:
-                font = pygame.font.SysFont('Comic Sans MS', 15)
+                font = pygame.font.SysFont(gfont, 15)
                 text = font.render(self.name, True, (255 - color[0], 255 - color[1], 255 - color[2]))
                 screen.blit(text, (size[0] / 2 - width / 2, size[1] - 200))
-            font = pygame.font.SysFont('Comic Sans MS', 20)
+            font = pygame.font.SysFont(gfont, 20)
             text = font.render(message[0:i + 1], True, (255 - color[0], 255 - color[1], 255 - color[2]))
             screen.blit(text, (size[0] / 2 - text.get_width() // 2,
                                size[1] - 150 - text.get_height() // 2))
@@ -337,18 +372,19 @@ class NPC(Sign):
         Sign.__init__(self, x, y, img, mess, name)
         self.walkable = False
 
+
 class Enemy(NPC):
-    def __init__(self, x, y, img, mess, name,func):
+    def __init__(self, x, y, img, mess, name, func):
         Sign.__init__(self, x, y, img, mess, name)
         self.func = func
-    def textbox(self,message,width):
-        global name
-        Sign.textbox(self,message,width)
-        if eval(self.func) == name:
-            Sign.textbox(self,'gg',width)
-        else:
-            Sign.textbox(self,'better luck next time',width)
 
+    def textbox(self, message, width):
+        global name
+        Sign.textbox(self, message, width)
+        if eval(self.func) == name:
+            Sign.textbox(self, 'gg', width)
+        else:
+            Sign.textbox(self, 'better luck next time', width)
 
 
 class TransTile(Tile):
@@ -380,6 +416,8 @@ class Portal(Tile):
 
 class button:
     def __init__(self, label, color, place, size):
+        global tr
+        self.tlabel = tr.translate(label)
         self.label = label
         self.color = color
         self.size = size
@@ -394,18 +432,25 @@ class button:
         return self.label
 
     def draw(self):
-        global screen
+        global screen, gfont
         rect = pygame.Rect(self.place[0], self.place[1], self.size[0], self.size[1])
         pygame.draw.rect(screen, self.color, rect, 0, 7)
-        font = pygame.font.SysFont('Comic Sans MS', 20)
-        text = font.render(self.label, True, (255 - self.color[0], 255 - self.color[1], 255 - self.color[2]))
+        font = pygame.font.SysFont(gfont, 20)
+        text = font.render(self.tlabel, True, (255 - self.color[0], 255 - self.color[1], 255 - self.color[2]))
         screen.blit(text, (self.place[0] + self.size[0] // 2 - text.get_width() // 2,
                            self.place[1] + self.size[1] // 2 - text.get_height() // 2))
 
 
 def text(text, x, y, size=20):
-    global screen
-    font = pygame.font.SysFont('Comic Sans MS', size)
+    global screen, gfont, lang
+
+    if lang == 'zh':
+        gfont = 'Sim Sun'
+    elif lang == 'ja':
+        gfont == 'Noto Sans JP'
+    else:
+        gfont = 'Comic Sans MS'
+    font = pygame.font.SysFont(gfont, size)
     txt = font.render(text, True, (0, 0, 0))
     wrapped_text = textwrap.wrap(text)
     for i, line in enumerate(wrapped_text):
@@ -414,7 +459,7 @@ def text(text, x, y, size=20):
 
 
 def load(file):
-    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel,coins
+    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel, coins, lang, tr
     sf = file
     save = configparser.ConfigParser()
     save.read(file)
@@ -422,15 +467,26 @@ def load(file):
     fullscreen = save.getboolean('META', 'fullscreen')
     name = str(save.get('PLAYER', 'name'))
     pronouns = save.get('PLAYER', 'pronouns')
-    pronouns = {'they':pronouns[0],'them':pronouns[1],'their':pronouns[2],'theirs':pronouns[3],'themself':pronouns[4]}
+    pronouns = {'they': pronouns[0], 'them': pronouns[1], 'their': pronouns[2], 'theirs': pronouns[3],
+                'themself': pronouns[4]}
     player.x = save.getint('PLAYER', 'xpos')
     player.y = save.getint('PLAYER', 'ypos')
     lebel = save.getint('PLAYER', 'level')
     player.coins = save.getint('PLAYER', 'coins')
+    lang = str(save.get('META', 'lang'))
+    try:
+        tr = Translator(to_lang=lang)
+        title = tr.translate('INSERT TITLE HERE')
+    except:
+        class trans:
+            def translate(self, word):
+                return word
+
+        tr = trans()
 
 
 def backup():
-    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel,coins
+    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel, coins
     save.set('PLAYER', 'xpos', str(int(player.x - xoffset)))
     with open(sf, 'w') as savfile:
         save.write(savfile)
@@ -446,7 +502,7 @@ def backup():
 
 
 def start():
-    global size, done
+    global size, done, title
 
     def off():
         started = True
@@ -470,7 +526,7 @@ def start():
                         saveFile()
         screen.fill(WHITE)
         sb.draw()
-        text("INSERT TITLE HERE", size[0] / 2, size[1] * 0.4, 50)
+        text(title, size[0] / 2, size[1] * 0.4, 50)
         pygame.display.flip()
         clock.tick(60)
 
@@ -509,8 +565,9 @@ def saveFile():
         pygame.display.flip()
         clock.tick(60)
 
+
 def setName():
-    global save,sf
+    global save, sf
     save = configparser.ConfigParser()
 
     global size, done, name
@@ -530,7 +587,8 @@ def setName():
                 elif event.key == pygame.K_RETURN:
                     sf = name + '.sav'
                     f = open(sf, 'a')
-                    f.write('[META]\nfullscreen=false\n[PLAYER]\nname=\npronouns=\nxpos=10\nypos=10\nlevel=1\ncoins =0')
+                    f.write(
+                        '[META]\nfullscreen=false\nlang=zh\n[PLAYER]\nname=\npronouns=\nxpos=10\nypos=10\nlevel=1\ncoins =0')
                     f.flush()
                     f.close()
                     save.read(sf)
@@ -571,8 +629,9 @@ def setPronouns():
                     if len(pronouns) != 5:
                         pass
                     else:
-                        save.set('PLAYER', 'pronouns', f'[{pronouns[0]},{pronouns[1]},{pronouns[2]},{pronouns[3]},{pronouns[4]}]')
-                                 #str(pronouns))
+                        save.set('PLAYER', 'pronouns',
+                                 f'[{pronouns[0]},{pronouns[1]},{pronouns[2]},{pronouns[3]},{pronouns[4]}]')
+                        # str(pronouns))
                         with open(sf, 'w') as savfile:
                             save.write(savfile)
                         save.set('META', 'hasplayed', 'true')
@@ -593,36 +652,92 @@ def setPronouns():
 
 
 def pause():
-    global size, done
+    global size, done, language, lang, lebel, tr
 
+    # function to turn off the pause screen
     def off():
         started = True
 
+    # uwu, making our buttons for the pause screen
     sb = button('Continue', BLUE, (size[0] * 0.25, size[1] * 0.75), (100, 50))
     quit = button('Quit', RED, (size[0] * 0.75, size[1] * 0.75), (100, 50))
     save = button('Save', PURPLE, (size[0] * 0.5, size[1] * 0.75), (100, 50))
+    language_change = button(lang, WHITE, (size[0] * 0.9, size[1] * 0.1), (100, 50))
+
+    # starting the pause screen
     started = False
     while not started and not done:
         for event in pygame.event.get():
+            # uwu, quiting the game if the red x is clicked
             if event.type == pygame.QUIT:
                 backup()
                 done = True
+            # uwu, checking if the enter key is pressed
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     if sb.click():
                         started = True
+            # uwu, checking if a button is clicked
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if sb.click():
+                    loadLevel(lebel)
                     started = True
+                # uwu, backing up and quiting the game if the quit button is clicked
                 if quit.click():
                     backup()
                     done = True
+                # uwu, backing up the game if the save button is clicked
                 if save.click():
                     backup()
+                # uwu, changing the language if the language change button is clicked
+                if language_change.click():
+                    language = lang
+                    if language == 'en':
+                        language = 'es'
+                    elif language == 'es':
+                        language = 'fr'
+                    elif language == 'fr':
+                        language = 'de'
+                    elif language == 'de':
+                        language = 'it'
+                    elif language == 'it':
+                        language = 'zh'
+                    elif language == 'zh':
+                        language = 'ja'
+                    elif language == 'ja':
+                        language = 'tl'
+                    elif language == 'tl':
+                        language = 'pt'
+                    elif language == 'pt':
+                        language = 'en'
+                    else:
+                        language = 'en'
+                    try:
+                        print(language)
+
+                        tr = Translator(to_lang=language)
+                        title = tr.translate('INSERT TITLE HERE')
+                        lang = language
+                        sb = button('Continue', BLUE, (size[0] * 0.25, size[1] * 0.75), (100, 50))
+                        quit = button('Quit', RED, (size[0] * 0.75, size[1] * 0.75), (100, 50))
+                        save = button('Save', PURPLE, (size[0] * 0.5, size[1] * 0.75), (100, 50))
+                        language_change = button(lang, WHITE, (size[0] * 0.9, size[1] * 0.1), (100, 50))
+
+                    except:
+                        class trans:
+                            def translate(self, word):
+                                return word
+
+                        tr = trans()
+                        title = tr.translate('INSERT TITLE HERE')
+        # uwu, filling the background with white
         screen.fill(WHITE)
+        # uwu, drawing our buttons
         sb.draw()
         quit.draw()
         save.draw()
+        language_change.draw()
+        # uwu, displaying "Paused" on the screen
         text("Paused", size[0] / 2, size[1] * 0.4, 50)
         pygame.display.flip()
         clock.tick(60)
@@ -661,7 +776,7 @@ def catch():
             else:
                 if points > cpupoints:
                     winner = name
-                    player.coins +=points//randint(1,5)
+                    player.coins += points // randint(1, 5)
                 else:
                     winner = enemy
                 return winner
@@ -713,6 +828,7 @@ def catch():
         text(str(seconds), size[0] / 2, 20)
         pygame.display.flip()
         clock.tick(60)
+
 
 def fish():
     global size, done, name
@@ -822,6 +938,7 @@ def loadLevel(level, first=False):
     leave = tiled_map.get_layer_by_name("Leave")
     enemies = tiled_map.get_layer_by_name("Enemy")
     homes = tiled_map.get_layer_by_name("House")
+    doors = tiled_map.get_layer_by_name("Doors")
     for x, y, image in water.tiles():
         tiles.append(Obstacle(x, y, image))
     for x, y, image in land.tiles():
@@ -833,8 +950,7 @@ def loadLevel(level, first=False):
             tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message, sign.name))
         except:
             try:
-                tiles.append(Sign(sign.x, sign.y, sign.image,
-                                  sign.Message))
+                tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message))
             except:
                 pass
     for sign in NPCS:
@@ -851,22 +967,24 @@ def loadLevel(level, first=False):
     for house in leave:
         tiles.append(Transport(house.x, house.y, house.image))
     for house in homes:
-        tiles.append(House(house.x, house.y, house.image,house.goto))
+        tiles.append(House(house.x, house.y, house.image, house.goto))
+    for door in doors:
+        tiles.append(Door(door.x, door.y, door.image, door.goto))
     if not first:
         for pos in start:
             player.x = pos.x
             player.y = pos.y
     for sign in enemies:
         try:
-            tiles.append(Enemy(sign.x, sign.y, sign.image, sign.Message, sign.name,sign.game))
+            tiles.append(Enemy(sign.x, sign.y, sign.image, sign.Message, sign.name, sign.game))
         except:
             pass
     xoffset = 0
     yoffset = 0
-    findinfo()
+
 
 def findinfo():
-    global history
+    global history, tr, lang
     num = 0
     # display a fun fact
     fun_facts = [
@@ -890,11 +1008,36 @@ def findinfo():
         "The fog is coming",
         "they are coming for you. run",
         "there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin there are bugs in your skin ",
-        "make sure to punch a local cop"
+        "make sure to punch a local cop",
+        "The tallest mammal in the world is the giraffe, with a height that can reach up to 18 feet.",
+        "The largest diamond ever discovered weighed a whopping 3,106 carats!",
+        "A group of hedgehogs is called a prickle.",
+        "The average person will spend six months of their life waiting for red lights to turn green.",
+        "The average person will also spend one year of their life trying to find lost items!",
+        "The world's largest pyramid is not in Egypt, but in Mexico!",
+        "The world's largest volcano is located in the Pacific Ocean and is named Mauna Loa.",
+        "The longest river in the world is the Nile, stretching over 4,000 miles.",
+        "The tallest building in the world is the Burj Khalifa in Dubai, standing at over 2,700 feet tall.",
+        "The world's largest island is Greenland, with an area of over 840,000 square miles!",
+        "The world's largest ocean is the Pacific Ocean, covering over 60 million square miles.",
+        "The smallest country in the world is the Vatican City, with a total area of just 0.17 square miles.",
+        "The world's largest desert is the Antarctic Desert, covering over 5.5 million square miles!",
+        "The world's largest park is the Northeast Greenland National Park, with an area of over 972,000 square miles!",
+        "The world's longest cave system is the Mammoth Cave National Park in Kentucky, with over 365 miles of explored passages.",
+        "The original design for Mario was actually a carpenter, not a plumber",
+        "The first video game to feature a jump button was 1982's Moon Patrol",
+        "The original name for the character Pac-Man was Puck-Man, but was changed due to fear of vandalism",
+        "The original design for Donkey Kong was actually a Popeye game, but the license was never acquired",
+        "In the original version of The Legend of Zelda, the Triforce was actually a triangle made up of hearts, not golden triangles",
+        "The game 'Metal Gear Solid' was originally going to be a side-scrolling game, but changed to a full 3D game due to the success of 'Super Mario 64'",
+        "In the original version of Sonic the Hedgehog, Sonic could actually spin dash, but it was cut due to hardware limitations",
+        "The game 'Tetris' was originally created to be played on a calculator, not a gaming console or computer",
+        "The game 'Mortal Kombat' was originally going to feature a type of tag team mode, but was cut due to memory limitations",
+        "The original design for the character Mega Man was actually a robot named Rock, but was changed to Mega Man due to copyright issues"
 
     ]
     fun_fact = random.choice(fun_facts)
-    history =[]
+    history = []
 
     user = str(Path.cwd()).split('\\')[2]
     profiles = []
@@ -946,27 +1089,28 @@ def findinfo():
     sorted_visit_count = {k: v for k, v in sorted(visit_count.items(), key=lambda item: item[1])}
 
     num = 0
+
+    loading_text = tr.translate("Loading...")
+    fact_text = tr.translate(f"Fun Fact: {fun_fact}")
     # print the sorted dictionary
     for k, v in sorted_visit_count.items():
         # set the background color
         screen.fill((255, 255, 255))
 
         # display a loading message
-        loading_text = "Loading..."
-        loading_font = pygame.font.SysFont("Comic Sans MS", 30)
+
+        loading_font = pygame.font.SysFont(gfont, 30)
         loading_surface = loading_font.render(loading_text, True, (0, 0, 0))
-        loading_rect = loading_surface.get_rect(center=(size[0]//2, 150))
+        loading_rect = loading_surface.get_rect(center=(size[0] // 2, 150))
         screen.blit(loading_surface, loading_rect)
 
-        text(f'{int((num/len(sorted_visit_count))*100)}%', size[0] // 2, size[1]//2)
+        text(f'{int((num / len(sorted_visit_count)) * 100)}%', size[0] // 2, size[1] // 2)
         num += 1
-        fact_text = f"Fun Fact: {fun_fact}"
-        text(fact_text,size[0]//2, size[1]-150)
-
+        text(fact_text, size[0] // 2, size[1] - 150)
 
         if 'e6' in k or 'furaffinity' in k or 'yiff' in k and 'furry' not in player.att:
             player.att.append('furry')
-            history.append([k,v])
+            history.append([k, v])
         if 'stackoverflow' in k or 'github' in k and 'programmer' not in player.att:
             player.att.append('programmer')
             history.append([k, v])
@@ -976,8 +1120,10 @@ def findinfo():
     # Close the connection to the database
     player.att = list(set(player.att))
     conn.close()
+
+
 def tetris():
-    global screen, clock, size,done, name
+    global screen, clock, size, done, name
     W, H = 8, 13
     TILE = 32
     GAME_RES = W * TILE, H * TILE
@@ -997,7 +1143,7 @@ def tetris():
                    [(0, 0), (0, -1), (0, 1), (-1, -1)],
                    [(0, 0), (0, -1), (0, 1), (1, -1)],
                    [(0, 0), (0, -1), (0, 1), (-1, 0)],
-                   [(0,1),(0,-1),(1,0),(-1,0)]]
+                   [(0, 1), (0, -1), (1, 0), (-1, 0)]]
 
     figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
     figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
@@ -1354,8 +1500,9 @@ def tetris():
         pygame.display.flip()
         clock.tick(60)
 
+
 def play():
-    global size, done, name, pronouns, player, tiles, map, xoffset, yoffset, behind, key, lebel
+    global size, done, name, pronouns, player, tiles, map, xoffset, yoffset, behind, key, lebel, tr
     speed = 5
     sb = button('||', GREEN, (50, 50), (50, 50))
     started = False
@@ -1385,7 +1532,7 @@ def play():
         for i in range(0, len(behind)):
             behind[i].draw()
         text(f'{(player.x - xoffset)},{(player.y - yoffset)}', size[0] / 2, size[1] * 0.2, 50)
-        text(f'Coins:{player.coins}',size[0]-75,50)
+        text(f'Coins:{player.coins}', size[0] - 75, 50)
         player.invDraw()
         pygame.display.flip()
 
@@ -1394,5 +1541,6 @@ def play():
 
 player = Player()
 start()
+findinfo()
 fart = randint(0, 3)
 play()

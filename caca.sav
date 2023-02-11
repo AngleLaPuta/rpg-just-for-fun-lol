@@ -1,0 +1,13 @@
+[META]
+fullscreen = false
+lang = zh
+hasplayed = true
+
+[PLAYER]
+name = caca
+pronouns = [he,him,hie,hdfd,df]
+xpos = 411
+ypos = 544
+level = 1
+coins = 0
+
