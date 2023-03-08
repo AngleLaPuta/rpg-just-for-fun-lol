@@ -1,0 +1,13 @@
+[META]
+fullscreen = false
+lang = en
+hasplayed = true
+
+[PLAYER]
+name = jiafei
+pronouns = ['they','them','their','theirs','thermself']
+xpos = 10
+ypos = 10
+level = 1
+coins = 0
+

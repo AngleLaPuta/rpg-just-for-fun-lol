@@ -4,8 +4,10 @@ from pytmx import load_pygame
 from pathlib import Path
 from urllib.parse import urlparse
 import sqlite3
-import twitter
+import locale
+import inflect
 import math
+import ctypes
 from copy import deepcopy
 import random
 from random import choice, randrange, randint
@@ -35,7 +37,15 @@ name = ""
 dir_list = os.listdir()
 xoffset = 0
 yoffset = 0
-lang = 'es'
+windll = ctypes.windll.kernel32
+print(locale.windows_locale[windll.GetUserDefaultUILanguage()])
+lang = locale.windows_locale[windll.GetUserDefaultUILanguage()][:2]
+
+pronouns =['']*5
+
+zaza = pygame.image.load('textures/weed.png')
+cookie = pygame.image.load('textures/edible.png')
+items = [zaza,cookie]
 
 ##TRANSLATIONS AND STUFF
 try:
@@ -77,6 +87,38 @@ try:
 except:
     pass
 
+class TextBox:
+    def __init__(self, x, y, width, height, font_size=20, title=""):
+        self.rect = pygame.Rect(x-width//2, y, width, height)
+        self.font_size = font_size
+        self.title = title
+        self.text = ""
+        self.active = False
+        self.font = pygame.font.SysFont('Comic Sans MS', font_size)
+        self.width = width
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.active = True
+            else:
+                self.active = False
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    return self.text
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+
+    def draw(self, screen):
+        text_surface = self.font.render(self.text, True, (0, 0, 0))
+        title_surface = self.font.render(self.title, True, (0, 0, 0))
+        screen.blit(title_surface, (self.rect.x, self.rect.y - self.font_size - 5))
+        pygame.draw.rect(screen, (0, 0, 0), self.rect, 2)
+        screen.blit(text_surface, (self.rect.x + self.width //2 - text_surface.get_width()//2, self.rect.y + 5))
+
 
 class Player:
     def __init__(self):
@@ -86,7 +128,7 @@ class Player:
         self.x = 500
         self.y = 500
         self.color = (0, 250, 23)
-        self.inv = ['ball', 'banana']
+        self.inv = [zaza, cookie]
         self.coins = 0
         self.att = []
 
@@ -104,6 +146,11 @@ class Player:
         for i in range(0, len(self.inv)):
             tile = pygame.Rect(x, y, 50, 50)
             pygame.draw.rect(screen, (100, 100, 100), tile)
+            try:
+                self.inv[i] = pygame.transform.scale(self.inv[i],(50,50))
+                screen.blit(self.inv[i],(x,y))
+            except:
+                pass
             pygame.draw.rect(screen, BLACK, tile, 2)
             x += 50
 
@@ -120,7 +167,9 @@ class Player:
             self.x + x * 0.75, self.y + y * 0.75) and self.grounded(self.x + x, self.y + y)
 
     def move(self, keys):
-        global xoffset, yoffset
+        global xoffset, yoffset,items
+        if randint(0,727)== 69:
+            self.inv.append(choice(items))
         speed = 5
         ltile = rtile = dtile = utile = ptile = Tile((self.x + self.width / 2) // tilesize,
                                                      (self.y + self.height / 2) // tilesize)
@@ -287,13 +336,10 @@ class House(Transport):
         if x + width >= self.x and y + height >= self.y and x <= self.x + self.width and y <= self.y + self.height:
             self.key = key
             if not self.key == 'z' and not self.key == 'x':
-                pass
-                # text('Press z or x to continue', size[0] / 2, size[1] - 100, 30)
-                pygame.display.flip()
+                return True
             else:
                 findinfo()
                 loadLevel(self.goto)
-                return
         return False
 
 
@@ -318,9 +364,9 @@ class Sign(Tile):
         self.y = y
         self.touched = False
         try:
-            self.message = tr.translate(mess)
+            self.message = tr.translate(format(mess))
         except:
-            self.message = mess
+            self.message = format(mess)
         self.name = name
 
     def colissions(self, x, y):
@@ -335,28 +381,42 @@ class Sign(Tile):
             self.touched = False
         return False
 
+    # This function will create a textbox on the screen, meow!
     def textbox(self, message, width):
         global done, gfont
         color = PURPLE
-        width = max(int(pygame.font.SysFont(gfont, 20).render(message, True, (
-            255 - color[0], 255 - color[1], 255 - color[2])).get_width() * 1.1), 400)
+        width = max(int(pygame.font.SysFont(gfont, 20).render('e'*50, True, (
+        255 - color[0], 255 - color[1], 255 - color[2])).get_width() * 1.1), 400)
         for i in range(0, width):
             rect = pygame.Rect(size[0] / 2 - i / 2, size[1] - 200, i, 100)
             pygame.draw.rect(screen, color, rect, 0)
             pygame.display.flip()
-        for i in range(0, len(message)):
-            rect = pygame.Rect(size[0] / 2 - width / 2, size[1] - 200, width, 100)
-            pygame.draw.rect(screen, color, rect, 0)
-            if self.name:
-                font = pygame.font.SysFont(gfont, 15)
-                text = font.render(self.name, True, (255 - color[0], 255 - color[1], 255 - color[2]))
-                screen.blit(text, (size[0] / 2 - width / 2, size[1] - 200))
-            font = pygame.font.SysFont(gfont, 20)
-            text = font.render(message[0:i + 1], True, (255 - color[0], 255 - color[1], 255 - color[2]))
-            screen.blit(text, (size[0] / 2 - text.get_width() // 2,
-                               size[1] - 150 - text.get_height() // 2))
-            pygame.display.flip()
-            sleep(0.01)
+
+        lines = textwrap.wrap(message, width=50)
+        line_height = 20
+
+        for i, line in enumerate(lines):
+            for k in range(len(line)):
+                rect = pygame.Rect(size[0] / 2 - width / 2, size[1] - 200, width, 100)
+                pygame.draw.rect(screen, color, rect, 0)
+
+                if self.name:
+                    font = pygame.font.SysFont(gfont, 15)
+                    text = font.render(self.name, True, (255 - color[0], 255 - color[1], 255 - color[2]))
+                    screen.blit(text, (size[0] / 2 - width / 2, size[1] - 200))
+
+                font = pygame.font.SysFont(gfont, 20)
+                for j in range(0,i):
+                    text = font.render(lines[j], True, (255 - color[0], 255 - color[1], 255 - color[2]))
+                    screen.blit(text,
+                                (size[0] / 2 - text.get_width() // 2,
+                                 size[1] - 150 + j * line_height - text.get_height() // 2))
+
+                text = font.render(line[0:k], True, (255 - color[0], 255 - color[1], 255 - color[2]))
+                screen.blit(text,
+                            (size[0] / 2 - text.get_width() // 2, size[1] - 150 + i * line_height - text.get_height() // 2))
+                pygame.display.flip()
+                sleep(0.01)
         key = True
         while key:
             for event in pygame.event.get():
@@ -364,13 +424,40 @@ class Sign(Tile):
                     key = False
                     done = True
                 if event.type == pygame.KEYDOWN:
-                    key = False
+                    if event.key == pygame.K_z or event.key == pygame.K_x:
+                        key = False
+
 
 
 class NPC(Sign):
     def __init__(self, x, y, img, mess, name):
         Sign.__init__(self, x, y, img, mess, name)
         self.walkable = False
+
+class ConversationalNPC(NPC):
+    def __init__(self, x, y, img, dialog, name = 'Nigga'):
+        self.dialog = dialog
+        self.current_dialog_index = 0
+        NPC.__init__(self, x, y, img, '', name)
+
+    def talk(self):
+        if self.current_dialog_index < len(self.dialog):
+            message = self.dialog[self.current_dialog_index]
+            self.textbox(message[self.current_dialog_index], 400)
+            self.current_dialog_index += 1
+
+    def collisions(self,x,y):
+        width = player.width
+        height = player.height
+        rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        if x + width >= self.x and y + height >= self.y and x <= self.x + self.width and y <= self.y + self.height:
+            if not self.touched:
+                self.talk()
+                self.touched = True
+                self.current_dialog_index =0
+        else:
+            self.touched = False
+        return False
 
 
 class Enemy(NPC):
@@ -385,6 +472,81 @@ class Enemy(NPC):
             Sign.textbox(self, 'gg', width)
         else:
             Sign.textbox(self, 'better luck next time', width)
+
+class Shopkeeper(NPC):
+    def __init__(self, x, y, img,inventory , name = 'Bob'):
+        self.inventory = inventory
+        NPC.__init__(self, x, y, img, '', name)
+
+    def textbox(self):
+        global done, gfont, player
+        color = PURPLE
+        width = max(int(pygame.font.SysFont(gfont, 20).render('e'*50, True, (
+        255 - color[0], 255 - color[1], 255 - color[2])).get_width() * 1.1), 400)
+
+        # create a surface to display the inventory
+        inv_surface = pygame.Surface((width, 400))
+        inv_surface.fill((255, 255, 255))
+
+        # display the inventory items
+        font = pygame.font.SysFont(gfont, 20)
+        for i, item in enumerate(self.inventory):
+            text = font.render(f"{item.name} ({item.price}$)", True, (0, 0, 0))
+            inv_surface.blit(text, (10, i * 30 + 10))
+
+        # display the player's money
+        money_text = font.render(f"Money: {player.coins}$", True, (0, 0, 0))
+        inv_surface.blit(money_text, (10, 350))
+
+        # draw the inventory surface onto the main screen
+        screen.blit(inv_surface, (size[0] / 2 - width / 2, size[1] / 2 - 200))
+
+        # update the display
+        pygame.display.flip()
+
+        # handle mouse clicks
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+                    return
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    # get the position of the mouse click
+                    pos = pygame.mouse.get_pos()
+
+                    # check if the mouse click is inside an inventory item
+                    for i, item in enumerate(self.inventory):
+                        item_rect = pygame.Rect(size[0] / 2 - width / 2 + 10, size[1] / 2 - 200 + i * 30 + 10, 200, 30)
+                        if item_rect.collidepoint(pos):
+                            # check if the player has enough money to buy the item
+                            if player.coins >= item.price:
+                                # subtract the item price from the player's money
+                                player.coins -= item.price
+                                # add the item to the player's inventory
+                                player.inv.append(item)
+                                # remove the item from the shop's inventory
+                                self.inventory.remove(item)
+                                # display a message to confirm the purchase
+                                self.textbox(f"You bought {item.name} for {item.price}$!",500)
+                                return
+                            else:
+                                # display a message if the player doesn't have enough money
+                                self.textbox("You don't have enough money to buy that!",500)
+                                return
+
+
+    def collisions(self, x, y):
+        width = player.width
+        height = player.height
+        rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        if x + width >= self.x and y + height >= self.y and x <= self.x + self.width and y <= self.y + self.height:
+            if not self.touched:
+                self.textbox()
+                self.touched = True
+        else:
+            self.touched = False
+        return False
+
 
 
 class TransTile(Tile):
@@ -440,16 +602,43 @@ class button:
         screen.blit(text, (self.place[0] + self.size[0] // 2 - text.get_width() // 2,
                            self.place[1] + self.size[1] // 2 - text.get_height() // 2))
 
+def format(text):
+    global pronouns,name,tool
+    engine = inflect.engine()
+    text = text.replace('[they]', pronouns[0])
+    text = text.replace('[them]', pronouns[1])
+    text = text.replace('[their]', pronouns[2])
+    text = text.replace('[theirs]', pronouns[3])
+    text = text.replace('[themself]', pronouns[4])
+    text = text.replace('[player]', name)
+    try:
+        text = text.replace('[att]', random.choice(player.att))
+        text = text.replace('[atts]', engine.plural(random.choice(player.att)))
+    except:
+        text = text.replace('[att]', 'person')
+        text = text.replace('[atts]', 'people')
+    sentences = text.split(".")
+    sentences = [s.strip().capitalize() for s in sentences]
+    text = ". ".join(sentences) + "."
+    return text
 
 def text(text, x, y, size=20):
-    global screen, gfont, lang
-
+    global screen, gfont, lang,pronouns, name
+    # Define font choices for different languages
     if lang == 'zh':
         gfont = 'Sim Sun'
     elif lang == 'ja':
-        gfont == 'Noto Sans JP'
+        gfont = 'Noto Sans JP'
+    elif lang == 'ko':
+        gfont = 'Nanum Gothic'
+    elif lang in ['ar', 'hi']:
+        gfont = 'Noto Naskh Arabic'
     else:
         gfont = 'Comic Sans MS'
+
+
+    text =format(text)
+
     font = pygame.font.SysFont(gfont, size)
     txt = font.render(text, True, (0, 0, 0))
     wrapped_text = textwrap.wrap(text)
@@ -466,9 +655,8 @@ def load(file):
 
     fullscreen = save.getboolean('META', 'fullscreen')
     name = str(save.get('PLAYER', 'name'))
-    pronouns = save.get('PLAYER', 'pronouns')
-    pronouns = {'they': pronouns[0], 'them': pronouns[1], 'their': pronouns[2], 'theirs': pronouns[3],
-                'themself': pronouns[4]}
+    pronouns = eval(save.get('PLAYER', 'pronouns'))
+    print(pronouns)
     player.x = save.getint('PLAYER', 'xpos')
     player.y = save.getint('PLAYER', 'ypos')
     lebel = save.getint('PLAYER', 'level')
@@ -486,7 +674,7 @@ def load(file):
 
 
 def backup():
-    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel, coins
+    global name, fullscreen, pronouns, ft, save, sf, player, xoffset, yoffset, lebel, coins,lang
     save.set('PLAYER', 'xpos', str(int(player.x - xoffset)))
     with open(sf, 'w') as savfile:
         save.write(savfile)
@@ -497,6 +685,9 @@ def backup():
     with open(sf, 'w') as savfile:
         save.write(savfile)
     save.set('PLAYER', 'coins', str(player.coins))
+    with open(sf, 'w') as savfile:
+        save.write(savfile)
+    save.set('META', 'lang', lang)
     with open(sf, 'w') as savfile:
         save.write(savfile)
 
@@ -588,7 +779,7 @@ def setName():
                     sf = name + '.sav'
                     f = open(sf, 'a')
                     f.write(
-                        '[META]\nfullscreen=false\nlang=zh\n[PLAYER]\nname=\npronouns=\nxpos=10\nypos=10\nlevel=1\ncoins =0')
+                        '[META]\nfullscreen=false\nlang=en\n[PLAYER]\nname=\npronouns=\nxpos=10\nypos=10\nlevel=1\ncoins =0')
                     f.flush()
                     f.close()
                     save.read(sf)
@@ -609,50 +800,62 @@ def setName():
 
 
 def setPronouns():
-    global size, done, pronouns, sf, save
+    global size, done, sf, save
 
-    def off():
-        started = True
+    subject_box = TextBox(size[0] / 2 - 150, size[1] * 0.4, 150, 30, title="Subjective")
+    obj_box = TextBox(size[0] / 2 + 150, size[1] * 0.4, 150, 30, title="Objective")
+    poss_det_box = TextBox(size[0] / 2 , size[1] * 0.6, 150, 30, title="Possessive Determiner")
+    poss_box = TextBox(size[0] / 2 - 150, size[1] * 0.8, 150, 30, title="Possessive")
+    reflexive_box = TextBox(size[0] / 2 + 150, size[1] * 0.8, 150, 30, title="Reflexive")
 
-    started = False
-    pronouns = []
-    txt = ""
-    while not started and not done:
+    while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+
+            subject_box.handle_event(event)
+            obj_box.handle_event(event)
+            poss_det_box.handle_event(event)
+            poss_box.handle_event(event)
+            reflexive_box.handle_event(event)
+
             if event.type == pygame.KEYDOWN:
-                if event.unicode == 'poop':
-                    pass
-                elif event.key == pygame.K_RETURN:
-                    pronouns = txt.split('/')
-                    if len(pronouns) != 5:
-                        pass
-                    else:
-                        save.set('PLAYER', 'pronouns',
-                                 f'[{pronouns[0]},{pronouns[1]},{pronouns[2]},{pronouns[3]},{pronouns[4]}]')
-                        # str(pronouns))
+                if event.key == pygame.K_RETURN:
+                    pronouns = [
+                        subject_box.text,
+                        obj_box.text,
+                        poss_det_box.text,
+                        poss_box.text,
+                        reflexive_box.text
+                    ]
+                    if all(pronouns):
+                        save.set('PLAYER', 'pronouns', f"['{pronouns[0]}','{pronouns[1]}','{pronouns[2]}','{pronouns[3]}','{pronouns[4]}']")
                         with open(sf, 'w') as savfile:
                             save.write(savfile)
                         save.set('META', 'hasplayed', 'true')
                         with open(sf, 'w') as savfile:
                             save.write(savfile)
-                        started = True
-                elif event.key == pygame.K_BACKSPACE:
-                    txt = txt[:-1]
-                else:
-                    txt += event.unicode
-        screen.fill(WHITE)
-        text("Please enter your pronouns", size[0] / 2, size[1] * 0.4, 50)
-        text("(format 'they/them/their/theirs/themself' please)", size[0] / 2, size[1] * 0.5)
+                        return
+                    else:
+                        # Handle case where not all text boxes have text entered
+                        pass
 
-        text(txt, size[0] / 2, size[1] * 0.7)
+        screen.fill(WHITE)
+        text("Please enter your pronouns", size[0] / 2, size[1] * 0.2, 50)
+        text("(format 'they/them/their/theirs/themself' please)", size[0] / 2, size[1] * 0.3)
+
+        subject_box.draw(screen)
+        obj_box.draw(screen)
+        poss_det_box.draw(screen)
+        poss_box.draw(screen)
+        reflexive_box.draw(screen)
+
         pygame.display.flip()
         clock.tick(60)
 
 
 def pause():
-    global size, done, language, lang, lebel, tr
+    global size, done, language, lang, lebel, tr,tool
 
     # function to turn off the pause screen
     def off():
@@ -692,31 +895,13 @@ def pause():
                 # uwu, changing the language if the language change button is clicked
                 if language_change.click():
                     language = lang
-                    if language == 'en':
-                        language = 'es'
-                    elif language == 'es':
-                        language = 'fr'
-                    elif language == 'fr':
-                        language = 'de'
-                    elif language == 'de':
-                        language = 'it'
-                    elif language == 'it':
-                        language = 'zh'
-                    elif language == 'zh':
-                        language = 'ja'
-                    elif language == 'ja':
-                        language = 'tl'
-                    elif language == 'tl':
-                        language = 'pt'
-                    elif language == 'pt':
-                        language = 'en'
-                    else:
-                        language = 'en'
+                    language_list = ['en', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'tl', 'pt', 'ru', 'ar', 'hi', 'ko']
+                    current_index = language_list.index(language)
+                    language = language_list[(current_index + 1) % len(language_list)]
                     try:
                         print(language)
 
                         tr = Translator(to_lang=language)
-                        title = tr.translate('INSERT TITLE HERE')
                         lang = language
                         sb = button('Continue', BLUE, (size[0] * 0.25, size[1] * 0.75), (100, 50))
                         quit = button('Quit', RED, (size[0] * 0.75, size[1] * 0.75), (100, 50))
@@ -939,6 +1124,19 @@ def loadLevel(level, first=False):
     enemies = tiled_map.get_layer_by_name("Enemy")
     homes = tiled_map.get_layer_by_name("House")
     doors = tiled_map.get_layer_by_name("Doors")
+    try:
+        keeps = tiled_map.get_layer_by_name("Shopkeep")
+        for sign in keeps:
+            try:
+                tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message, sign.name))
+            except:
+                try:
+                    tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message))
+                except:
+                    pass
+    except:
+        pass
+
     for x, y, image in water.tiles():
         tiles.append(Obstacle(x, y, image))
     for x, y, image in land.tiles():
@@ -1119,6 +1317,8 @@ def findinfo():
 
     # Close the connection to the database
     player.att = list(set(player.att))
+    if player.att ==[]:
+        player.att.append('boring ass person')
     conn.close()
 
 

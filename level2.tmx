@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="75" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="7">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="75" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="9">
  <tileset firstgid="1" name="RPG Nature Tileset" tilewidth="32" tileheight="32" tilecount="180" columns="20">
   <image source="textures/RPG Nature Tileset.png" width="641" height="288"/>
  </tileset>
@@ -181,7 +181,17 @@
  <objectgroup id="5" name="Sign">
   <object id="6" gid="3" x="705" y="509" width="32" height="32">
    <properties>
-    <property name="Message" value="the house isnt finished just so ya know :3"/>
+    <property name="Message" value="hey [player] the house isnt finished just so ya know :3"/>
+   </properties>
+  </object>
+  <object id="7" gid="3" x="577" y="543" width="32" height="32">
+   <properties>
+    <property name="Message" value="we fucking hate [atts] ugly ass niggas."/>
+   </properties>
+  </object>
+  <object id="8" gid="3" x="417" y="480" width="32" height="32">
+   <properties>
+    <property name="Message" value="have you heard about [player]?. [they] suck because they are an [att]"/>
    </properties>
   </object>
  </objectgroup>

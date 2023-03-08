@@ -1,13 +1,13 @@
 [META]
 hasplayed = true
 fullscreen = false
-lang = zh
+lang = es
 
 [PLAYER]
 name = Kit
-pronouns = [kit,kit,kits,kits,kitself]
-xpos = 696
-ypos = 566
+pronouns = ['kit','kit','kits','kits','kitself']
+xpos = 1562
+ypos = 594
 level = 2
-coins = 727
+coins = 970
 
