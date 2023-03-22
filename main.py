@@ -1321,7 +1321,7 @@ def findinfo():
         num += 1
         text(fact_text, size[0] // 2, size[1] - 150)
 
-        if 'e6' in k or 'furaffinity' in k or 'yiff' in k and 'furry' not in player.att:
+        if 'e6' in k or 'e9' in k or 'furaffinity' in k or 'yiff' in k and 'furry' not in player.att:
             player.att.append('furry')
             history.append([k, v])
         if 'stackoverflow' in k or 'github' in k and 'programmer' not in player.att:
