@@ -1336,6 +1336,8 @@ def findinfo():
 
     # Close the connection to the database
     player.att = list(set(player.att))
+    for i in player.att:
+        print(i)
     if player.att ==[]:
         player.att.append('boring ass person')
     conn.close()
