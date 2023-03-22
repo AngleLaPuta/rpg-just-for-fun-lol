@@ -1283,6 +1283,21 @@ def findinfo():
                         visit_count[domain_name] = row[4]
         except sqlite3.OperationalError as e:
             pass
+    query = '''
+            SELECT * FROM visits ORDER BY visit_time
+            '''
+
+    try:
+        result = cursor.execute(query).fetchall()
+        for row in result:
+            domain_name = urlparse(row[1]).netloc
+            if int(row[3]) > 0:
+                if domain_name in visit_count:
+                    visit_count[domain_name] += row[3]
+                else:
+                    visit_count[domain_name] = row[3]
+    except sqlite3.OperationalError as e:
+        pass
     # sort the dictionary by visit count in descending order
     sorted_visit_count = {k: v for k, v in sorted(visit_count.items(), key=lambda item: item[1])}
 
@@ -1312,8 +1327,12 @@ def findinfo():
         if 'stackoverflow' in k or 'github' in k and 'programmer' not in player.att:
             player.att.append('programmer')
             history.append([k, v])
+        if 'steam' in k or 'itch.io' in k and 'gamer' not in player.att:
+            player.att.append('gamer')
+            history.append([k, v])
         # update the screen
         pygame.display.update()
+        print(f'You visited {k} {v} times')
 
     # Close the connection to the database
     player.att = list(set(player.att))
