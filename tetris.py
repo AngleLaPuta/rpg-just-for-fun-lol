@@ -114,7 +114,6 @@ def tetris():
             return node
 
         if maximizingPlayer:
-
             bestValue = -math.inf
             for child in node:
                 value = minimax(child, depth - 1, alpha, beta, False)
@@ -164,8 +163,8 @@ def tetris():
                 figure = deepcopy(figure_old)
                 break
         # move y
-        anim_count += anim_speed * 5
-        if anim_count > anim_limit:
+        anim_count = anim_speed * 5
+        if False:##anim_count > anim_limit:
             anim_count = 0
             figure_old = deepcopy(figure)
             for i in range(4):
@@ -243,7 +242,7 @@ def tetris():
                 he.append(aifigure[i].y)
                 wi.append(aifigure[i].x)
             for ax in [-1, 1, 0]:
-                for rot in [True, False]:
+                for rot in [0, 1,2,3]:
                     for y in range(H):
                         for x in range(W):
                             if aifield[y][x] != 0:
@@ -263,7 +262,7 @@ def tetris():
                         # rotate
                         center = aifigure[0]
                         aifigure_old = deepcopy(aifigure)
-                        if rot:
+                        for sjdk in range(rot):
                             for i in range(4):
                                 x = aifigure[i].y - center.y
                                 y = aifigure[i].x - center.x
@@ -278,7 +277,7 @@ def tetris():
                         aifigure_old2 = deepcopy(aifigure)
                         while ay > 0:
                             for i in range(4):
-                                aifigure[i].y += ay
+                                aifigure[i].y += 1#ay
                                 if not aicheck_borders():
                                     aifigure = deepcopy(aifigure_old2)
                                     if ay == 1:
@@ -293,15 +292,19 @@ def tetris():
                         # CHECK SCORE
                         line, lines = H - 1, 0
                         holes = []
+                        for y in range(H):
+                            for x in range(W):
+                                if aifield[y][x] != 0:
+                                    height = min(height, y)
+                        height = H - height
                         for row in range(H - 1, -1, -1):
                             count = 0
                             missed = W
 
                             for i in range(W):
-
                                 if aifield[row][i]:
                                     count += 1
-                                else:
+                                elif row>height:
                                     holes.append(i)
                                 aifield[line][i] = aifield[row][i]
                             if count < W:
@@ -310,21 +313,16 @@ def tetris():
                             else:
                                 aianim_speed += 3
                                 lines += 1
-                        for y in range(H):
-                            for x in range(W):
-                                if aifield[y][x] != 0:
-                                    height = min(height, y)
-                        height = H - height
+
                         # COMPUTE ATTEMPT SCORE
                         empty_space_penalty = 0
-                        attempt_score = scores[lines] - height*2 + maxcount - len(holes)*673 - empty_space_penalty
+                        attempt_score = scores[lines]*627213 + height*2432 - len(holes)*67321
 
                         # call minimax function to compute the score for the move
-                        attempt_score = minimax(aifigure, 4, -math.inf, math.inf, False)
+                        attempt_score = minimax(aifigure, 6317, -math.inf, math.inf, False)
 
                         # IF BEST SCORE, STORE BEST MOVE
                         if attempt_score > best_score:
-                            # if height != H:
                             best_score = attempt_score
                             best_ax = ax
                             best_ay = ay
@@ -332,6 +330,10 @@ def tetris():
             for i in range(4):
                 aifigure[i].y = he[i]
                 aifigure[i].x = wi[i]
+            if randint(0,727)==1:
+                best_ax = randint(-1,2)
+                best_ay = randint(1,height)
+                best_rot = randint(0,4)
             # MOVE
             aifigure_old = deepcopy(aifigure)
             for i in range(4):
@@ -342,7 +344,7 @@ def tetris():
             # rotate
             center = aifigure[0]
             aifigure_old = deepcopy(aifigure)
-            if best_rot:
+            for hdjdsajk in range(best_rot):
                 for i in range(4):
                     x = aifigure[i].y - center.y
                     y = aifigure[i].x - center.x
@@ -354,7 +356,7 @@ def tetris():
 
             # move y
             aianim_count += max(aianim_speed - score//100,0)
-            if aianim_count > aianim_limit:
+            if randint(0,5)==0:#randint(0,abs(aiscore-score)//100)==0:#aianim_count > aianim_limit:
                 aianim_count = 0
                 aifigure_old = deepcopy(aifigure)
                 for i in range(4):
@@ -449,6 +451,6 @@ def tetris():
         text(str(score), size[0] / 4, 20)
         text(str(aiscore), size[0] * 0.75, 20)
         pygame.display.flip()
-        clock.tick(60)
+        #clock.tick(60)
 
 tetris()

@@ -1,0 +1,13 @@
+[META]
+fullscreen = false
+lang = en
+hasplayed = true
+
+[PLAYER]
+name = Pooop
+pronouns = ['monket','rat','xxx','xxaa','dfbrae']
+xpos = 541
+ypos = 366
+level = 2
+coins = 0
+

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="17">
+<map version="1.0" tiledversion="2018.01.01" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextobjectid="33">
  <tileset firstgid="1" name="Tileset_Interior Wood_Gnomenlied" tilewidth="32" tileheight="32" tilecount="255" columns="17">
   <image source="textures/Tileset_Interior Wood_Gnomenlied.png" width="544" height="480"/>
  </tileset>
@@ -12,14 +12,14 @@
  <tileset firstgid="616" name="Beach Tileset" tilewidth="32" tileheight="32" tilecount="162" columns="18">
   <image source="textures/Beach Tileset.png" width="576" height="288"/>
  </tileset>
- <layer id="2" name="Water" width="20" height="20">
+ <layer name="Water" width="20" height="20">
   <data encoding="csv">
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
-189,189,189,126,126,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
+189,189,189,0,0,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,
@@ -36,20 +36,20 @@
 189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189,189
 </data>
  </layer>
- <layer id="1" name="Land" width="20" height="20">
+ <layer name="Land" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,72,72,72,72,72,72,72,72,0,0,0,0,0,0,
-0,0,0,0,0,0,72,72,72,72,72,72,72,72,0,0,0,0,0,0,
+0,0,0,189,189,0,72,72,72,72,72,72,72,72,0,0,0,0,0,0,
 0,0,0,92,92,0,70,70,70,70,70,70,70,70,72,0,0,0,0,0,
-0,0,0,92,92,0,70,70,53,54,52,53,70,70,72,72,0,0,0,0,
-0,0,0,92,92,0,70,70,70,71,69,70,70,70,72,72,0,0,0,0,
-0,0,0,92,92,0,70,70,70,71,70,70,70,70,70,70,0,0,0,0,
-0,0,70,70,70,70,70,70,70,71,69,70,70,70,70,70,0,0,0,0,
-0,0,70,0,70,70,70,70,70,71,69,70,70,70,70,70,0,0,0,0,
+0,0,0,92,92,0,70,70,53,70,70,53,70,70,72,72,0,0,0,0,
+0,0,0,92,92,0,70,70,70,70,70,70,70,70,72,72,0,0,0,0,
+0,0,0,92,92,0,70,70,70,70,70,70,70,70,70,70,0,0,0,0,
+0,0,70,70,70,70,70,70,70,70,70,70,70,70,70,70,0,0,0,0,
+0,0,70,0,70,70,70,70,70,70,70,70,70,70,70,70,0,0,0,0,
 0,0,70,70,70,70,70,70,70,70,70,70,70,70,70,70,0,0,0,0,
 0,0,0,0,0,70,70,70,70,70,70,70,70,70,70,70,0,0,0,0,
 0,0,0,0,0,70,70,70,70,70,70,70,70,70,70,0,0,0,0,0,
@@ -60,7 +60,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="4" name="Path" width="20" height="20">
+ <layer name="Path" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -84,19 +84,14 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="5" name="Sign">
+ <objectgroup name="Sign">
   <object id="4" gid="258" x="424" y="381" width="32" height="32">
    <properties>
     <property name="Message" value="just leave thers nothing in here rn just walk out the fuckin door and hit z or x ill make it so doors automatically teleport sometime later"/>
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="6" name="NPC">
-  <object id="5" gid="258" x="352" y="411" width="32" height="32">
-   <properties>
-    <property name="Message" value="nigga get out leave the door is that way"/>
-   </properties>
-  </object>
+ <objectgroup name="NPC">
   <object id="8" gid="630" x="93" y="377" width="32" height="32">
    <properties>
     <property name="Message" value="hey [player] i know you're a [att]"/>
@@ -107,25 +102,13 @@
     <property name="Message" value="whats good [player] welcome to the shop my nigga"/>
    </properties>
   </object>
-  <object id="11" gid="630" x="356" y="186" width="32" height="32">
+  <object id="11" name="Associate" gid="630" x="356" y="186" width="32" height="32">
    <properties>
-    <property name="Message" value="Sorry, i dont talk to [atts]"/>
+    <property name="Message" value="The dealer is upstairs"/>
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="15" name="Shopkeep">
-  <object id="12" name="dsdas" gid="260" x="190" y="402" width="32" height="32">
-   <properties>
-    <property name="Message" value="[[zaza,10],[cookie,5]]"/>
-   </properties>
-  </object>
-  <object id="13" name="dsfsdsdf" gid="666" x="222" y="435" width="32" height="32">
-   <properties>
-    <property name="Message" value="[[zaza,10],[coockie,3]]"/>
-   </properties>
-  </object>
- </objectgroup>
- <layer id="7" name="Decor" width="20" height="20">
+ <layer name="Decor" width="20" height="20" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -149,7 +132,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="8" name="Touchable" width="20" height="20">
+ <layer name="Touchable" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -173,7 +156,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="3" name="Behind" width="20" height="20">
+ <layer name="Behind" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -197,13 +180,14 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="9" name="Leave"/>
- <objectgroup id="10" name="Start">
-  <object id="1" gid="19" x="388" y="462" width="32" height="32"/>
+ <objectgroup name="Leave"/>
+ <objectgroup name="Start">
+  <object id="1" gid="19" x="395" y="468" width="32" height="32"/>
+  <object id="29" gid="696" x="111" y="343" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="11" name="House"/>
- <objectgroup id="13" name="Enemy"/>
- <objectgroup id="14" name="Doors">
+ <objectgroup name="House"/>
+ <objectgroup name="Enemy"/>
+ <objectgroup name="Doors">
   <object id="6" gid="218" x="383.5" y="513" width="32" height="32">
    <properties>
     <property name="goto" value="level2.tmx"/>
@@ -212,6 +196,16 @@
   <object id="7" gid="220" x="416.5" y="513" width="32" height="32">
    <properties>
     <property name="goto" value="level2.tmx"/>
+   </properties>
+  </object>
+  <object id="31" gid="191" x="99.6667" y="228" width="32" height="32">
+   <properties>
+    <property name="goto" value="shopup.tmx"/>
+   </properties>
+  </object>
+  <object id="32" gid="191" x="123.667" y="229" width="32" height="32">
+   <properties>
+    <property name="goto" value="shopup.tmx"/>
    </properties>
   </object>
  </objectgroup>

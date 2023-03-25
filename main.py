@@ -168,8 +168,6 @@ class Player:
 
     def move(self, keys):
         global xoffset, yoffset,items
-        if randint(0,727)== 69:
-            self.inv.append(choice(items))
         speed = 5
         ltile = rtile = dtile = utile = ptile = Tile((self.x + self.width / 2) // tilesize,
                                                      (self.y + self.height / 2) // tilesize)
@@ -203,7 +201,7 @@ class Player:
                         else:
                             dtile = ptile
             except:
-                print(f'tile {i} isnt working')
+                print(f'tile {i} ({len(tiles)}) isnt working')
 
             # if not (tiles[i] == utile or tiles[i] == dtile or tiles[i] == ltile or tiles[i] == rtile):
             # tiles[i].color = None
@@ -354,6 +352,7 @@ class Door(House):
         rect = pygame.Rect(self.x, self.y, self.width, self.height)
         if x + width >= self.x and y + height >= self.y and x <= self.x + self.width and y <= self.y + self.height:
             loadLevel(self.goto)
+            return True
         return False
 
 
@@ -366,7 +365,10 @@ class Sign(Tile):
         try:
             self.message = tr.translate(format(mess))
         except:
-            self.message = format(mess)
+            try:
+                self.message = format(mess)
+            except:
+                self.message = mess
         self.name = name
 
     def colissions(self, x, y):
@@ -412,7 +414,7 @@ class Sign(Tile):
                                 (size[0] / 2 - text.get_width() // 2,
                                  size[1] - 150 + j * line_height - text.get_height() // 2))
 
-                text = font.render(line[0:k], True, (255 - color[0], 255 - color[1], 255 - color[2]))
+                text = font.render(line[0:k+1], True, (255 - color[0], 255 - color[1], 255 - color[2]))
                 screen.blit(text,
                             (size[0] / 2 - text.get_width() // 2, size[1] - 150 + i * line_height - text.get_height() // 2))
                 pygame.display.flip()
@@ -462,6 +464,7 @@ class ConversationalNPC(NPC):
 
 class Enemy(NPC):
     def __init__(self, x, y, img, mess, name, func):
+
         Sign.__init__(self, x, y, img, mess, name)
         self.func = func
 
@@ -475,8 +478,10 @@ class Enemy(NPC):
 
 class Shopkeeper(NPC):
     def __init__(self, x, y, img,inventory , name = 'Bob'):
-        self.inventory = inventory
-        NPC.__init__(self, x, y, img, '', name)
+        self.inventory = eval(inventory)
+        NPC.__init__(self, x, y, img, inventory, name)
+        self.img = img
+
 
     def textbox(self):
         global done, gfont, player
@@ -491,7 +496,8 @@ class Shopkeeper(NPC):
         # display the inventory items
         font = pygame.font.SysFont(gfont, 20)
         for i, item in enumerate(self.inventory):
-            text = font.render(f"{item.name} ({item.price}$)", True, (0, 0, 0))
+            print(item)
+            text = font.render(f"{item[0]} ({item[1]}$)", True, (0, 0, 0))
             inv_surface.blit(text, (10, i * 30 + 10))
 
         # display the player's money
@@ -519,23 +525,21 @@ class Shopkeeper(NPC):
                         item_rect = pygame.Rect(size[0] / 2 - width / 2 + 10, size[1] / 2 - 200 + i * 30 + 10, 200, 30)
                         if item_rect.collidepoint(pos):
                             # check if the player has enough money to buy the item
-                            if player.coins >= item.price:
+                            if player.coins >= item[1]:
                                 # subtract the item price from the player's money
-                                player.coins -= item.price
+                                player.coins -= item[1]
                                 # add the item to the player's inventory
-                                player.inv.append(item)
+                                player.inv.append(item[2])
                                 # remove the item from the shop's inventory
-                                self.inventory.remove(item)
+                                #self.inventory.remove(item)
                                 # display a message to confirm the purchase
-                                self.textbox(f"You bought {item.name} for {item.price}$!",500)
                                 return
                             else:
                                 # display a message if the player doesn't have enough money
-                                self.textbox("You don't have enough money to buy that!",500)
                                 return
 
 
-    def collisions(self, x, y):
+    def colissions(self, x, y):
         width = player.width
         height = player.height
         rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -614,12 +618,14 @@ def format(text):
     try:
         text = text.replace('[att]', random.choice(player.att))
         text = text.replace('[atts]', engine.plural(random.choice(player.att)))
+        text = text.replace('[ATT]', random.choice(player.att)).capitalize()
+        text = text.replace('[ATTS]', engine.plural(random.choice(player.att))).capitalize()
     except:
         text = text.replace('[att]', 'person')
         text = text.replace('[atts]', 'people')
     sentences = text.split(".")
     sentences = [s.strip().capitalize() for s in sentences]
-    text = ". ".join(sentences) + "."
+    #text = ". ".join(sentences) + "."
     return text
 
 def text(text, x, y, size=20):
@@ -1124,18 +1130,6 @@ def loadLevel(level, first=False):
     enemies = tiled_map.get_layer_by_name("Enemy")
     homes = tiled_map.get_layer_by_name("House")
     doors = tiled_map.get_layer_by_name("Doors")
-    try:
-        keeps = tiled_map.get_layer_by_name("Shopkeep")
-        for sign in keeps:
-            try:
-                tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message, sign.name))
-            except:
-                try:
-                    tiles.append(Sign(sign.x, sign.y, sign.image, sign.Message))
-                except:
-                    pass
-    except:
-        pass
 
     for x, y, image in water.tiles():
         tiles.append(Obstacle(x, y, image))
@@ -1153,7 +1147,10 @@ def loadLevel(level, first=False):
                 pass
     for sign in NPCS:
         try:
-            tiles.append(NPC(sign.x, sign.y, sign.image, sign.Message, sign.name))
+            if sign.type == 'shop':
+                tiles.append(Shopkeeper(sign.x, sign.y, sign.image, sign.Message, sign.name))
+            else:
+                tiles.append(NPC(sign.x, sign.y, sign.image, sign.Message, sign.name))
         except:
             pass
     for x, y, image in decor.tiles():
@@ -1168,10 +1165,24 @@ def loadLevel(level, first=False):
         tiles.append(House(house.x, house.y, house.image, house.goto))
     for door in doors:
         tiles.append(Door(door.x, door.y, door.image, door.goto))
+    # Find the closest start position to the player's current position
+    distance = lambda x1, y1, x2, y2: math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
     if not first:
-        for pos in start:
-            player.x = pos.x
-            player.y = pos.y
+        closest_start = start[0]
+        closest_distance = distance(player.x, player.y, closest_start.x, closest_start.y)
+        for pos in start[1:]:
+            # Calculate the distance between the player and this start position
+            dist = distance(player.x, player.y, pos.x, pos.y)
+
+            # If this start position is closer than the previous closest, update the closest position and distance
+            if dist < closest_distance:
+                closest_start = pos
+                closest_distance = dist
+
+        # Move the player to the closest start position
+        player.x = closest_start.x
+        player.y = closest_start.y
+
     for sign in enemies:
         try:
             tiles.append(Enemy(sign.x, sign.y, sign.image, sign.Message, sign.name, sign.game))
