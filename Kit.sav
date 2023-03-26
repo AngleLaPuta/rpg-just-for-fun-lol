@@ -6,8 +6,8 @@ lang = en
 [PLAYER]
 name = Kit
 pronouns = ['kit','kit','kits','kits','kitself']
-xpos = 395
-ypos = 419
+xpos = 414
+ypos = 377
 level = 2
-coins = 934
+coins = 207
 

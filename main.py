@@ -505,7 +505,7 @@ class Shopkeeper(NPC):
             inv_surface.blit(text, (10, i * 30 + 10))
 
         # Add Leave item to inventory display
-        leave_text = font.render("Leave (0$)", True, (0, 0, 0))
+        leave_text = font.render("Leave", True, (0, 0, 0))
         inv_surface.blit(leave_text, (10, len(self.inventory) * 30 + 10))
 
         # display the player's money
@@ -527,7 +527,9 @@ class Shopkeeper(NPC):
                 elif event.type == pygame.MOUSEBUTTONUP:
                     # get the position of the mouse click
                     pos = pygame.mouse.get_pos()
-
+                    item_rect = pygame.Rect(size[0] / 2 - width / 2 + 10, size[1] / 2 - 200 + len(self.inventory) * 30 + 10, 200, 30)
+                    if item_rect.collidepoint(pos):
+                        return
                     # check if the mouse click is inside an inventory item
                     for i, item in enumerate(self.inventory):
                         item_rect = pygame.Rect(size[0] / 2 - width / 2 + 10, size[1] / 2 - 200 + i * 30 + 10, 200, 30)
@@ -540,8 +542,6 @@ class Shopkeeper(NPC):
                                 player.inv.append(item[2])
                                 # remove the item from the shop's inventory
                                 #self.inventory.remove(item)
-                                # display a message to confirm the purchase
-                                return
                             else:
                                 # display a message if the player doesn't have enough money
                                 return
@@ -626,8 +626,8 @@ def format(text):
     try:
         text = text.replace('[att]', random.choice(player.att))
         text = text.replace('[atts]', engine.plural(random.choice(player.att)))
-        text = text.replace('[ATT]', random.choice(player.att)).capitalize()
-        text = text.replace('[ATTS]', engine.plural(random.choice(player.att))).capitalize()
+        text = text.replace('[ATT]', random.choice(player.att).capitalize())
+        text = text.replace('[ATTS]', engine.plural(random.choice(player.att)).capitalize())
     except:
         text = text.replace('[att]', 'person')
         text = text.replace('[atts]', 'people')
@@ -1186,7 +1186,7 @@ def loadLevel(level, first=False):
             if dist < closest_distance:
                 closest_start = pos
                 closest_distance = dist
-
+            print('X:',player.x, closest_start.x,'\nY:',player.y,closest_start.y)
         # Move the player to the closest start position
         player.x = closest_start.x
         player.y = closest_start.y
