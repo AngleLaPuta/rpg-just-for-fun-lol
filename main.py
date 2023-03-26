@@ -47,6 +47,10 @@ zaza = pygame.image.load('textures/weed.png')
 cookie = pygame.image.load('textures/edible.png')
 items = [zaza,cookie]
 
+talk = pygame.mixer.Sound('sounds/talk.mp3')
+pygame.mixer.music.load('sounds/music.mp3')
+pygame.mixer.music.play(-1)
+
 ##TRANSLATIONS AND STUFF
 try:
     tr = Translator(to_lang=lang)
@@ -396,7 +400,7 @@ class Sign(Tile):
 
         lines = textwrap.wrap(message, width=50)
         line_height = 20
-
+        pygame.mixer.Sound.play(talk)
         for i, line in enumerate(lines):
             for k in range(len(line)):
                 rect = pygame.Rect(size[0] / 2 - width / 2, size[1] - 200, width, 100)
@@ -499,6 +503,10 @@ class Shopkeeper(NPC):
             print(item)
             text = font.render(f"{item[0]} ({item[1]}$)", True, (0, 0, 0))
             inv_surface.blit(text, (10, i * 30 + 10))
+
+        # Add Leave item to inventory display
+        leave_text = font.render("Leave (0$)", True, (0, 0, 0))
+        inv_surface.blit(leave_text, (10, len(self.inventory) * 30 + 10))
 
         # display the player's money
         money_text = font.render(f"Money: {player.coins}$", True, (0, 0, 0))
