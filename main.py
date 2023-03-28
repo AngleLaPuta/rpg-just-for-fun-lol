@@ -626,8 +626,8 @@ def format(text):
     try:
         text = text.replace('[att]', random.choice(player.att))
         text = text.replace('[atts]', engine.plural(random.choice(player.att)))
-        text = text.replace('[ATT]', random.choice(player.att).capitalize())
-        text = text.replace('[ATTS]', engine.plural(random.choice(player.att)).capitalize())
+        text = text.replace('[ATT]', random.choice(player.att).upper())
+        text = text.replace('[ATTS]', engine.plural(random.choice(player.att)).upper())
     except:
         text = text.replace('[att]', 'person')
         text = text.replace('[atts]', 'people')
