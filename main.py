@@ -43,8 +43,8 @@ lang = locale.windows_locale[windll.GetUserDefaultUILanguage()][:2]
 
 pronouns =['']*5
 
-zaza = pygame.image.load('textures/weed.png')
-cookie = pygame.image.load('textures/edible.png')
+zaza = pygame.image.load('maps/textures/weed.png')
+cookie = pygame.image.load('maps/textures/edible.png')
 items = [zaza,cookie]
 
 talk = pygame.mixer.Sound('sounds/talk.mp3')
@@ -439,6 +439,19 @@ class NPC(Sign):
     def __init__(self, x, y, img, mess, name):
         Sign.__init__(self, x, y, img, mess, name)
         self.walkable = False
+
+class Circle(NPC):
+    def __init__(self, x, y, img, mess, name):
+        self.xcent = x
+        self.ycent = y
+        NPC.__init__(self, x, y, img, mess, name)
+    def draw(self):
+        if 0 <= self.x <= size[0] and 0 <= self.y <= size[1]:
+            rect = pygame.Rect(self.x+ 25*math.cos(pygame.time.get_ticks()/100), self.y+ 25*math.sin(pygame.time.get_ticks()/100), self.width, self.height)
+            if self.img:
+                screen.blit(self.img, rect)
+            if self.color:
+                pygame.draw.rect(screen, self.color, rect, 0)
 
 class ConversationalNPC(NPC):
     def __init__(self, x, y, img, dialog, name = 'Nigga'):
@@ -1119,9 +1132,9 @@ def fish():
 def loadLevel(level, first=False):
     global behind, tiles, xoffset, yoffset, player
     try:
-        tiled_map = load_pygame(f'level{level}.tmx')
+        tiled_map = load_pygame(f'maps/level{level}.tmx')
     except:
-        tiled_map = load_pygame(f'{level}')
+        tiled_map = load_pygame(f'maps/{level}')
     behind = []
     tiles = []
     tiles = []
@@ -1158,7 +1171,7 @@ def loadLevel(level, first=False):
             if sign.type == 'shop':
                 tiles.append(Shopkeeper(sign.x, sign.y, sign.image, sign.Message, sign.name))
             else:
-                tiles.append(NPC(sign.x, sign.y, sign.image, sign.Message, sign.name))
+                tiles.append(Circle(sign.x, sign.y, sign.image, sign.Message, sign.name))
         except:
             pass
     for x, y, image in decor.tiles():
@@ -1351,7 +1364,7 @@ def findinfo():
             history.append([k, v])
         # update the screen
         pygame.display.update()
-        print(f'You visited {k} {v} times')
+        #print(f'You visited {k} {v} times')
 
     # Close the connection to the database
     player.att = list(set(player.att))
@@ -1771,7 +1784,7 @@ def play():
         player.draw()
         for i in range(0, len(behind)):
             behind[i].draw()
-        text(f'{(player.x - xoffset)},{(player.y - yoffset)}', size[0] / 2, size[1] * 0.2, 50)
+        text(f'{pygame.time.get_ticks()}', size[0] / 2, size[1] * 0.2, 50)
         text(f'Coins:{player.coins}', size[0] - 75, 50)
         player.invDraw()
         pygame.display.flip()
