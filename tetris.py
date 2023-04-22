@@ -148,7 +148,8 @@ def tetris():
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN:
-                    anim_limit = 20
+                    pass
+                    #anim_limit = 20
                 if event.key == pygame.K_LEFT:
                     dx = -1
                 if event.key == pygame.K_RIGHT:
@@ -163,8 +164,10 @@ def tetris():
                 figure = deepcopy(figure_old)
                 break
         # move y
-        anim_count = anim_speed * 5
-        if False:##anim_count > anim_limit:
+        anim_count += anim_speed * 500
+        print(anim_count,anim_limit)
+        anim_limit=100
+        if anim_count > anim_limit:
             anim_count = 0
             figure_old = deepcopy(figure)
             for i in range(4):
