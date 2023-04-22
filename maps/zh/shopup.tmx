@@ -101,7 +101,7 @@
   </object>
   <object id="33" name="Soup" type="shop" gid="778" x="380" y="444.333" width="32" height="32">
    <properties>
-    <property name="Message" value="[[&quot;catnip blunt&quot;,12,zaza],['catnip edible',727,cookie]]"/>
+    <property name="Message" value="[[&quot;猫薄荷钝&quot;,12,zaza],['猫薄荷可食用',727,cookie]]"/>
    </properties>
   </object>
  </objectgroup>

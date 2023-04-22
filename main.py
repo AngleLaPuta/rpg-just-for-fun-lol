@@ -901,7 +901,7 @@ def pause():
                 # uwu, changing the language if the language change button is clicked
                 if language_change.click():
                     language = lang
-                    language_list = ['en', 'es']
+                    language_list = ['en', 'es','zh']
                     current_index = language_list.index(language)
                     language = language_list[(current_index + 1) % len(language_list)]
                     print(language)

@@ -88,12 +88,12 @@
  <objectgroup name="NPC">
   <object id="10" gid="630" x="287" y="186" width="32" height="32">
    <properties>
-    <property name="Message" value="que bueno [player] bienvenido a la tienda!"/>
+    <property name="Message" value="嗨[player]欢迎来到商店！"/>
    </properties>
   </object>
   <object id="11" name="Associate" gid="630" x="356" y="186" width="32" height="32">
    <properties>
-    <property name="Message" value="El tendero es en la piso superior"/>
+    <property name="Message" value="掌柜在顶楼"/>
    </properties>
   </object>
  </objectgroup>

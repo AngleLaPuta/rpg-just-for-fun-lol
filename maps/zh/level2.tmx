@@ -373,13 +373,13 @@
  <objectgroup name="Enemy">
   <object id="2" gid="348" x="639" y="478" width="32" height="32">
    <properties>
-    <property name="Message" value="Quieres jugar a tetris?"/>
+    <property name="Message" value="你想玩俄罗斯方块吗？"/>
     <property name="game" value="tetris()"/>
    </properties>
   </object>
   <object id="3" gid="326" x="373.333" y="541.333" width="32" height="32">
    <properties>
-    <property name="Message" value="Ahoy there matey! Vamos a pescar!"/>
+    <property name="Message" value="嘿，伙计！ 我们去钓鱼吧！"/>
     <property name="game" value="fish()"/>
    </properties>
   </object>
