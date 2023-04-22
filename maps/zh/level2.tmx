@@ -181,17 +181,17 @@
  <objectgroup name="Sign">
   <object id="6" gid="3" x="705" y="509" width="32" height="32">
    <properties>
-    <property name="Message" value="hey [player] the house isnt finished just so ya know :3"/>
+    <property name="Message" value="嘿 [player] 房子还没有完工，所以你知道 :3"/>
    </properties>
   </object>
   <object id="7" gid="3" x="577" y="543" width="32" height="32">
    <properties>
-    <property name="Message" value="we fucking hate [atts] ugly ass niggas."/>
+    <property name="Message" value="我们不喜欢 [atts] 丑陋的混蛋。"/>
    </properties>
   </object>
   <object id="8" gid="3" x="417" y="480" width="32" height="32">
    <properties>
-    <property name="Message" value="have you heard about [player]?. [they] suck because they are an [att]"/>
+    <property name="Message" value="你听说过[玩家]吗？ [他们]很烂，因为他们是[att]"/>
    </properties>
   </object>
  </objectgroup>

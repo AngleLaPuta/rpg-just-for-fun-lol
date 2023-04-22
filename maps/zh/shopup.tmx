@@ -91,12 +91,12 @@
  <objectgroup name="NPC">
   <object id="5" gid="258" x="352" y="411" width="32" height="32">
    <properties>
-    <property name="Message" value="coca cola espuma"/>
+    <property name="Message" value="內內個 內內 內個內個 內內"/>
    </properties>
   </object>
   <object id="8" gid="630" x="93" y="377" width="32" height="32">
    <properties>
-    <property name="Message" value="WE HATE [ATTS]!!!"/>
+    <property name="Message" value="我们讨厌 [ATTS]!!!"/>
    </properties>
   </object>
   <object id="33" name="Soup" type="shop" gid="778" x="380" y="444.333" width="32" height="32">
