@@ -15,7 +15,6 @@ import pygame
 import os
 import tkinter
 import configparser
-from translate import Translator
 
 debug = True
 gfont = 'Comic Sans MS'
@@ -43,26 +42,15 @@ lang = locale.windows_locale[windll.GetUserDefaultUILanguage()][:2]
 
 pronouns =['']*5
 
-zaza = pygame.image.load('maps/textures/weed.png')
-cookie = pygame.image.load('maps/textures/edible.png')
+zaza = pygame.image.load(f'maps/{lang}/textures/weed.png')
+cookie = pygame.image.load(f'maps/{lang}/textures/edible.png')
 items = [zaza,cookie]
 
 talk = pygame.mixer.Sound('sounds/talk.mp3')
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.play(-1)
 
-##TRANSLATIONS AND STUFF
-try:
-    tr = Translator(to_lang=lang)
-    title = tr.translate('INSERT TITLE HERE')
-except:
-    class trans:
-        def translate(self, word):
-            return word
-
-
-    tr = trans()
-    title = tr.translate('INSERT TITLE HERE')
+title = 'INSERT TITLE HERE'
 
 sprite = pygame.image.load('sprite.png')
 
@@ -367,7 +355,7 @@ class Sign(Tile):
         self.y = y
         self.touched = False
         try:
-            self.message = tr.translate(format(mess))
+            self.message = format(mess)
         except:
             try:
                 self.message = format(mess)
@@ -603,8 +591,7 @@ class Portal(Tile):
 
 class button:
     def __init__(self, label, color, place, size):
-        global tr
-        self.tlabel = tr.translate(label)
+        self.tlabel = label
         self.label = label
         self.color = color
         self.size = size
@@ -689,15 +676,7 @@ def load(file):
     lebel = save.getint('PLAYER', 'level')
     player.coins = save.getint('PLAYER', 'coins')
     lang = str(save.get('META', 'lang'))
-    try:
-        tr = Translator(to_lang=lang)
-        title = tr.translate('INSERT TITLE HERE')
-    except:
-        class trans:
-            def translate(self, word):
-                return word
 
-        tr = trans()
 
 
 def backup():
@@ -922,26 +901,12 @@ def pause():
                 # uwu, changing the language if the language change button is clicked
                 if language_change.click():
                     language = lang
-                    language_list = ['en', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'tl', 'pt', 'ru', 'ar', 'hi', 'ko']
+                    language_list = ['en', 'es']
                     current_index = language_list.index(language)
                     language = language_list[(current_index + 1) % len(language_list)]
-                    try:
-                        print(language)
-
-                        tr = Translator(to_lang=language)
-                        lang = language
-                        sb = button('Continue', BLUE, (size[0] * 0.25, size[1] * 0.75), (100, 50))
-                        quit = button('Quit', RED, (size[0] * 0.75, size[1] * 0.75), (100, 50))
-                        save = button('Save', PURPLE, (size[0] * 0.5, size[1] * 0.75), (100, 50))
-                        language_change = button(lang, WHITE, (size[0] * 0.9, size[1] * 0.1), (100, 50))
-
-                    except:
-                        class trans:
-                            def translate(self, word):
-                                return word
-
-                        tr = trans()
-                        title = tr.translate('INSERT TITLE HERE')
+                    print(language)
+                    lang = language
+                    language_change = button(lang, WHITE, (size[0] * 0.9, size[1] * 0.1), (100, 50))
         # uwu, filling the background with white
         screen.fill(WHITE)
         # uwu, drawing our buttons
@@ -1132,9 +1097,19 @@ def fish():
 def loadLevel(level, first=False):
     global behind, tiles, xoffset, yoffset, player
     try:
-        tiled_map = load_pygame(f'maps/level{level}.tmx')
+        try:
+            print(f'maps/{lang}/level{level}.tmx')
+            tiled_map = load_pygame(f'maps/{lang}/level{level}.tmx')
+        except:
+            print(f'maps/{lang}/{level}')
+            tiled_map = load_pygame(f'maps/{lang}/{level}')
     except:
-        tiled_map = load_pygame(f'maps/{level}')
+        try:
+            print(f'maps/en/level{level}.tmx')
+            tiled_map = load_pygame(f'maps/en/level{level}.tmx')
+        except:
+            print(f'maps/en/{level}')
+            tiled_map = load_pygame(f'maps/en/{level}')
     behind = []
     tiles = []
     tiles = []
@@ -1171,7 +1146,7 @@ def loadLevel(level, first=False):
             if sign.type == 'shop':
                 tiles.append(Shopkeeper(sign.x, sign.y, sign.image, sign.Message, sign.name))
             else:
-                tiles.append(Circle(sign.x, sign.y, sign.image, sign.Message, sign.name))
+                tiles.append(NPC(sign.x, sign.y, sign.image, sign.Message, sign.name))
         except:
             pass
     for x, y, image in decor.tiles():
@@ -1335,8 +1310,8 @@ def findinfo():
 
     num = 0
 
-    loading_text = tr.translate("Loading...")
-    fact_text = tr.translate(f"Fun Fact: {fun_fact}")
+    loading_text = "Loading..."
+    fact_text = f"Fun Fact: {fun_fact}"
     # print the sorted dictionary
     for k, v in sorted_visit_count.items():
         # set the background color
